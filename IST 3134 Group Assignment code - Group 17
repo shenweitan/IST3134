@@ -1,0 +1,75 @@
+# Changing user from 'root' to 'hadoop'
+sudo su - hadoop 
+
+# Formatting 'namenode' daemon for the first time
+hdfs namenode -format
+
+# Making directory for 'user/hadoop' in HDFS
+hadoop fs -mkdir /user
+
+hadoop fs -mkdir /user/hadoop 
+
+# Checking existing files in HDFS
+hadoop fs -ls 
+
+# Checking existing directories in local storage
+ls
+
+# Making new directory, 'assignment'
+mkdir ~/assignment
+
+# Changing to 'IST3134' directory to unzip and obtain '.java' files required for MapReduce task, and copy it into the 'assignment' folder
+cd IST3134
+
+unzip wordcount.zip
+
+ls
+
+cp -r wordcount/ ~/assignment/
+
+cd
+
+cd assignment
+
+# Obtaining dataset from S3 bucket, and uploading into HDFS
+wget https://bucket21088968.s3.amazonaws.com/BR_text10k.csv
+
+ls
+
+hadoop fs -put BR_text10k.csv
+
+cd wordcount/src
+
+ls
+
+# Compiling 'WordCount.java', 'WordMapper.java', and 'SumReducer.java' files into a .jar file
+javac -classpath `hadoop classpath` stubs/*.java
+
+jar cvf wc.jar stubs/*.class
+
+ls
+
+# Executing WordCount task using Java files in MapReduce on Hadoop
+hadoop jar wc.jar stubs.WordCount BR_text10k.csv br10k_wc
+
+# Viewing WordCount output in HDFS
+hadoop fs -cat br_wc10k/part-r-00000 | less
+
+hadoop cd ..
+
+hadoop cd ..
+
+# Downloading results from HDFS into local storage
+hadoop fs -get br10k_wc
+
+ls
+
+cd br10k_wc
+
+# Sorting WordCount results in descending order of count
+sort -k2,2nr part-r-00000 > sorted_part-r-00000
+
+ls
+
+# Viewing final sorted results
+nano sorted_part-r-00000
